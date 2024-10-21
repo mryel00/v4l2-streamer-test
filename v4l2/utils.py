@@ -163,3 +163,6 @@ def ctl_to_parsed_dict(dev_ctl: raw.v4l2_ext_control) -> dict:
             continue
         values[cur_sec][control] = cur_ctl['values']
     return values
+
+def pixelformat_to_fourcc(fmt: str) -> int:
+    return ord(fmt[0]) | (ord(fmt[1]) << 8) | (ord(fmt[2]) << 16) | (ord(fmt[3]) << 24)

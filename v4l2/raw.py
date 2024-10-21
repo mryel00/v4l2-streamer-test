@@ -75,7 +75,7 @@ class v4l2_pix_format_mplane(ctypes.Structure):
         ("flags",           ctypes.c_uint8),
         ("union",           EncodingUnion),
         ("quantization",    ctypes.c_uint8),
-        ("xfer_func",       ctypes.c_uint8)
+        ("xfer_func",       ctypes.c_uint8),
         ("reserved",        ctypes.c_uint8*7)
     ]
 
@@ -114,7 +114,6 @@ class v4l2_vbi_format(ctypes.Structure):
         ("count",               ctypes.c_uint32*2),
         ("flags",               ctypes.c_uint32),
         ("reserved",            ctypes.c_uint32*2)
-        
     ]
 
 class v4l2_sliced_vbi_format(ctypes.Structure):
@@ -155,7 +154,6 @@ class v4l2_format(ctypes.Structure):
             ("meta",        v4l2_meta_format),
             ("raw_data",    ctypes.c_uint8 * 200)
         ]
-        _anonymous_ = ("raw_data",)
     _fields_ = [
         ("type",    ctypes.c_uint32),
         ("fmt",     FormatUnion)
@@ -315,6 +313,10 @@ class v4l2_query_ext_ctrl(ctypes.Structure):
 
 VIDIOC_QUERYCAP                 = ioctl_macros.IOR(ord('V'), 0, v4l2_capability)
 VIDIOC_ENUM_FMT                 = ioctl_macros.IOWR(ord('V'), 2, v4l2_fmtdesc)
+VIDIOC_G_FMT                    = ioctl_macros.IOWR(ord('V'), 4, v4l2_format)
+VIDIOC_S_FMT                    = ioctl_macros.IOWR(ord('V'), 5, v4l2_format)
+# VIDIOC_REQBUFS                  = ioctl_macros.IOWR(ord('V'), 8, v4l2_requestbuffers)
+# VIDIOC_QUERYBUF                 = ioctl_macros.IOWR(ord('V'), 9, v4l2_buffer)
 VIDIOC_G_CTRL                   = ioctl_macros.IOWR(ord('V'), 27, v4l2_control)
 VIDIOC_S_CTRL                   = ioctl_macros.IOWR(ord('V'), 28, v4l2_control)
 VIDIOC_QUERYCTRL                = ioctl_macros.IOWR(ord('V'), 36, v4l2_queryctrl)
@@ -324,3 +326,4 @@ VIDIOC_S_EXT_CTRLS              = ioctl_macros.IOWR(ord('V'), 72, v4l2_ext_contr
 VIDIOC_ENUM_FRAMESIZES          = ioctl_macros.IOWR(ord('V'), 74, v4l2_frmsizeenum)
 VIDIOC_ENUM_FRAMEINTERVALS      = ioctl_macros.IOWR(ord('V'), 75, v4l2_frmivalenum)
 VIDIOC_QUERY_EXT_CTRL           = ioctl_macros.IOWR(ord('V'), 103, v4l2_query_ext_ctrl)
+

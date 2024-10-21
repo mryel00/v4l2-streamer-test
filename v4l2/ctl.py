@@ -181,7 +181,6 @@ def set_control_with_qc(device_path: str, qc: raw.v4l2_query_ext_ctrl, value: in
         if utils.ioctl_safe(fd, raw.VIDIOC_S_CTRL, ctrl) != -1:
             success = True
         os.close(fd)
-        return success
     except FileNotFoundError:
         pass
     return success
@@ -217,3 +216,14 @@ def get_formats(device_path: str) -> dict:
         return formats
     except FileNotFoundError:
         return {}
+
+def set_format(device_path: str, format: raw.v4l2_format) -> bool:
+    success = False
+    try:
+        fd = os.open(device_path, os.O_RDWR)
+        if utils.ioctl_safe(fd, raw.VIDIOC_S_FMT, format) != -1:
+            success = True
+        os.close(fd)
+    except FileNotFoundError:
+        pass
+    return success

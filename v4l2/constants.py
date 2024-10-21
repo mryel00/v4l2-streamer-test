@@ -101,3 +101,14 @@ V4L2_CAP_META_OUTPUT                = 0x08000000
 V4L2_CAP_TOUCH                      = 0x10000000
 V4L2_CAP_IO_MC                      = 0x20000000
 V4L2_CAP_DEVICE_CAPS                = 0x80000000
+
+V4L2_FIELD_ANY                      = 0
+V4L2_FIELD_NONE                     = 1
+V4L2_FIELD_TOP                      = 2
+V4L2_FIELD_BOTTOM                   = 3
+V4L2_FIELD_INTERLACED               = 4
+V4L2_FIELD_SEQ_TB                   = 5
+V4L2_FIELD_SEQ_BT                   = 6
+V4L2_FIELD_ALTERNATE                = 7
+V4L2_FIELD_INTERLACED_TB            = 8
+V4L2_FIELD_INTERLACED_BT            = 9
