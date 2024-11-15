@@ -112,3 +112,9 @@ V4L2_FIELD_SEQ_BT                   = 6
 V4L2_FIELD_ALTERNATE                = 7
 V4L2_FIELD_INTERLACED_TB            = 8
 V4L2_FIELD_INTERLACED_BT            = 9
+
+# Memory
+V4L2_MEMORY_MMAP                    = 1
+V4L2_MEMORY_USERPTR                 = 2
+V4L2_MEMORY_OVERLAY                 = 3
+V4L2_MEMORY_DMABUF                  = 4

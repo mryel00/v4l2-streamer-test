@@ -178,8 +178,7 @@ def set_control_with_qc(device_path: str, qc: raw.v4l2_query_ext_ctrl, value: in
         ctrl = raw.v4l2_control()
         ctrl.id = qc.id
         ctrl.value = value
-        if utils.ioctl_safe(fd, raw.VIDIOC_S_CTRL, ctrl) != -1:
-            success = True
+        success = utils.ioctl_safe(fd, raw.VIDIOC_S_CTRL, ctrl) != -1
         os.close(fd)
     except FileNotFoundError:
         pass
@@ -221,9 +220,23 @@ def set_format(device_path: str, format: raw.v4l2_format) -> bool:
     success = False
     try:
         fd = os.open(device_path, os.O_RDWR)
-        if utils.ioctl_safe(fd, raw.VIDIOC_S_FMT, format) != -1:
-            success = True
+        success = utils.ioctl_safe(fd, raw.VIDIOC_S_FMT, format) != -1
         os.close(fd)
     except FileNotFoundError:
         pass
     return success
+
+def request_buffer(device_path: str, req_buf_count: int) -> int:
+    ret_buf_count = -1
+    buf = raw.v4l2_requestbuffers()
+    buf.count = req_buf_count
+    buf.type = constants.V4L2_BUF_TYPE_VIDEO_CAPTURE
+    buf.memory = constants.V4L2_MEMORY_MMAP
+    try:
+        fd = os.open(device_path, os.O_RDWR)
+        ret_buf_count = utils.ioctl_safe(fd, raw.VIDIOC_REQBUFS, buf)
+        os.close(fd)
+    except FileNotFoundError:
+        pass
+    return ret_buf_count
+

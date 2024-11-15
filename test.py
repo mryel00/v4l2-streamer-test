@@ -1,6 +1,7 @@
 # https://www.marcusfolkesson.se/blog/capture-a-picture-with-v4l2/
 
 from v4l2 import ctl, constants, raw, utils
+import os
 
 device_path = '/dev/video0'
 
@@ -18,16 +19,15 @@ cam_format.fmt.pix.width = 1920
 cam_format.fmt.pix.height = 1080
 cam_format.fmt.pix.field = constants.V4L2_FIELD_NONE
 
-def test():
-    import os
+def test_get_format():
     fmt = raw.v4l2_format()
     fd = os.open(device_path, os.O_RDWR)
     utils.ioctl_safe(fd, raw.VIDIOC_S_FMT, fmt)
     os.close(fd)
     print(fmt.fmt.pix.width, fmt.fmt.pix.height)
 
-test()
 res = ctl.set_format(device_path, cam_format)
-test()
+test_get_format()
+count = ctl.request_buffer(device_path, 1)
 
-print(res)
+print(count)

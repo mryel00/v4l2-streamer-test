@@ -159,6 +159,70 @@ class v4l2_format(ctypes.Structure):
         ("fmt",     FormatUnion)
     ]
 
+class v4l2_requestbuffers(ctypes.Structure):
+    _fields_ = [
+        ("count",       ctypes.c_uint32),
+        ("type",        ctypes.c_uint32),
+        ("memory",      ctypes.c_uint32),
+        ("reserved",    ctypes.c_uint32*2)
+    ]
+
+class timeval(ctypes.Structure):
+    _fields_ = [
+        ("tv_sec",  ctypes.c_long),
+        ("tv_usec", ctypes.c_int)
+    ]
+
+class v4l2_timecode(ctypes.Structure):
+    _fields_ = [
+        ("type",        ctypes.c_uint32),
+        ("flags",       ctypes.c_uint32),
+        ("frames",      ctypes.c_uint8),
+        ("seconds",     ctypes.c_uint8),
+        ("minutes",     ctypes.c_uint8),
+        ("hours",       ctypes.c_uint8),
+        ("userbits",    ctypes.c_uint8 * 4)
+    ]
+
+class v4l2_plane(ctypes.Structure):
+    class UnionValue(ctypes.Union):
+        _fields_ = [
+            ("mem_offset",  ctypes.c_uint32),
+            ("userptr",     ctypes.c_ulong),
+            ("fd",          ctypes.c_int32)
+        ]
+    _fields_ = [
+        ("bytesused",   ctypes.c_uint32),
+        ("length",      ctypes.c_uint32),
+        ("m",           UnionValue),
+        ("data_offset", ctypes.c_uint32),
+        ("reserved",    ctypes.c_uint32 * 11)
+    ]
+
+class v4l2_buffer(ctypes.Structure):
+    class UnionValue(ctypes.Union):
+        _fields_ = [
+            ("offset",  ctypes.c_uint32),
+            ("userptr", ctypes.c_ulong),
+            ("planes",  ctypes.POINTER(v4l2_plane)),
+            ("fd",      ctypes.c_int32)
+        ]
+    _fields_ = [
+        ("index",       ctypes.c_uint32),
+        ("type",        ctypes.c_uint32),
+        ("bytesused",   ctypes.c_uint32),
+        ("flags",       ctypes.c_uint32),
+        ("field",       ctypes.c_uint32),
+        ("timestamp",   timeval),
+        ("timecode",    v4l2_timecode),
+        ("sequence",    ctypes.c_uint32),
+        ("memory",      ctypes.c_uint32),
+        ("m",           UnionValue),
+        ("length",      ctypes.c_uint32),
+        ("reserved2",   ctypes.c_uint32),
+        ("reserved",    ctypes.c_uint32)
+    ]
+
 class v4l2_control(ctypes.Structure):
     _fields_ = [
         ("id",      ctypes.c_uint32),
@@ -315,7 +379,7 @@ VIDIOC_QUERYCAP                 = ioctl_macros.IOR(ord('V'), 0, v4l2_capability)
 VIDIOC_ENUM_FMT                 = ioctl_macros.IOWR(ord('V'), 2, v4l2_fmtdesc)
 VIDIOC_G_FMT                    = ioctl_macros.IOWR(ord('V'), 4, v4l2_format)
 VIDIOC_S_FMT                    = ioctl_macros.IOWR(ord('V'), 5, v4l2_format)
-# VIDIOC_REQBUFS                  = ioctl_macros.IOWR(ord('V'), 8, v4l2_requestbuffers)
+VIDIOC_REQBUFS                  = ioctl_macros.IOWR(ord('V'), 8, v4l2_requestbuffers)
 # VIDIOC_QUERYBUF                 = ioctl_macros.IOWR(ord('V'), 9, v4l2_buffer)
 VIDIOC_G_CTRL                   = ioctl_macros.IOWR(ord('V'), 27, v4l2_control)
 VIDIOC_S_CTRL                   = ioctl_macros.IOWR(ord('V'), 28, v4l2_control)
