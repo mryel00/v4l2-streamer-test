@@ -2,8 +2,12 @@
 
 import os
 import copy
+import mmap
+import ctypes
 
 from . import raw, constants, utils
+
+tmp = None
 
 dev_ctls: dict[str, dict[str, dict[str, (raw.v4l2_ext_control, str)]]] = {}
 
@@ -219,24 +223,83 @@ def get_formats(device_path: str) -> dict:
 def set_format(device_path: str, format: raw.v4l2_format) -> bool:
     success = False
     try:
-        fd = os.open(device_path, os.O_RDWR)
+        fd = device_path # os.open(device_path, os.O_RDWR)
         success = utils.ioctl_safe(fd, raw.VIDIOC_S_FMT, format) != -1
-        os.close(fd)
+        # os.close(fd)
     except FileNotFoundError:
         pass
     return success
 
 def request_buffer(device_path: str, req_buf_count: int) -> int:
-    ret_buf_count = -1
     buf = raw.v4l2_requestbuffers()
     buf.count = req_buf_count
     buf.type = constants.V4L2_BUF_TYPE_VIDEO_CAPTURE
     buf.memory = constants.V4L2_MEMORY_MMAP
     try:
-        fd = os.open(device_path, os.O_RDWR)
-        ret_buf_count = utils.ioctl_safe(fd, raw.VIDIOC_REQBUFS, buf)
-        os.close(fd)
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        if utils.ioctl_safe(fd, raw.VIDIOC_REQBUFS, buf) == -1:
+            raise Exception("Requsting Buffer")
+        # os.close(fd)
     except FileNotFoundError:
         pass
-    return ret_buf_count
+    return buf.count
 
+def query_buffer(device_path: str, index: int) -> tuple[mmap.mmap, int]:
+    buf = raw.v4l2_buffer()
+    buf.type = constants.V4L2_BUF_TYPE_VIDEO_CAPTURE
+    buf.memory = constants.V4L2_MEMORY_MMAP
+    buf.index = index
+    try:
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        if utils.ioctl_safe(fd, raw.VIDIOC_QUERYBUF, buf) == -1:
+            raise Exception("Query Buffer")
+        tmp = mmap.mmap(fd, buf.length, offset=buf.m.offset)
+        # os.close(fd)
+    except FileNotFoundError:
+        pass
+    return tmp, buf.length
+
+def queue_buffer(device_path: str, index: int) -> int:
+    buf = raw.v4l2_buffer()
+    buf.type = constants.V4L2_BUF_TYPE_VIDEO_CAPTURE
+    buf.memory = constants.V4L2_MEMORY_MMAP
+    buf.index = index
+    try:
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        ret = utils.ioctl_safe(fd, raw.VIDIOC_QBUF, buf)
+        # print(f"q{ret}")
+        # os.close(fd)
+    except FileNotFoundError:
+        pass
+    return buf.bytesused
+
+def dequeue_buffer(device_path: str) -> int:
+    buf = raw.v4l2_buffer()
+    buf.type = constants.V4L2_BUF_TYPE_VIDEO_CAPTURE
+    buf.memory = constants.V4L2_MEMORY_MMAP
+    try:
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        ret = utils.ioctl_safe(fd, raw.VIDIOC_DQBUF, buf)
+        # print(f"dq{ret}")
+        # os.close(fd)
+    except FileNotFoundError:
+        pass
+    return buf.index
+
+def start_streaming(device_path: str) -> None:
+    type = ctypes.c_int(constants.V4L2_BUF_TYPE_VIDEO_CAPTURE)
+    try:
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        utils.ioctl_safe(fd, raw.VIDIOC_STREAMON, type)
+        # os.close(fd)
+    except FileNotFoundError:
+        pass
+
+def stop_streaming(device_path: str) -> None:
+    type = ctypes.c_int(constants.V4L2_BUF_TYPE_VIDEO_CAPTURE)
+    try:
+        fd = device_path # os.open(device_path, os.O_RDWR)
+        utils.ioctl_safe(fd, raw.VIDIOC_STREAMOFF, type)
+        # os.close(fd)
+    except FileNotFoundError:
+        pass

@@ -13,6 +13,7 @@ def ioctl_safe(fd: int, request: int, arg: ctypes.Structure) -> int:
     try:
         return fcntl.ioctl(fd, request, arg)
     except OSError as e:
+        print(f"{e.strerror} - {e.errno}")
         return -1
 
 def ioctl_iter(fd: int, cmd: int, struct: ctypes.Structure,
